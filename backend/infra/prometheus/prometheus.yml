@@ -1,0 +1,38 @@
+global:
+  scrape_interval: 15s # Raccourcir pour le développement si nécessaire
+
+scrape_configs:
+  - job_name: 'eureka-server'
+    metrics_path: '/actuator/prometheus'
+    eureka_sd_configs:
+      - server: http://eureka-server:8761/eureka
+
+  - job_name: 'config-server'
+    metrics_path: '/actuator/prometheus'
+    eureka_sd_configs:
+      - server: http://eureka-server:8761/eureka
+
+  - job_name: 'api-gateway'
+    metrics_path: '/actuator/prometheus'
+    eureka_sd_configs:
+      - server: http://eureka-server:8761/eureka
+
+  - job_name: 'ms-users'
+    metrics_path: '/actuator/prometheus'
+    eureka_sd_configs:
+      - server: http://eureka-server:8761/eureka
+
+  - job_name: 'ms-books'
+    metrics_path: '/actuator/prometheus'
+    eureka_sd_configs:
+      - server: http://eureka-server:8761/eureka
+
+  - job_name: 'ms-loans'
+    metrics_path: '/actuator/prometheus'
+    eureka_sd_configs:
+      - server: http://eureka-server:8761/eureka
+
+  - job_name: 'ms-public-catalog'
+    metrics_path: '/actuator/prometheus'
+    eureka_sd_configs:
+      - server: http://eureka-server:8761/eureka

@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/users_db # Sera remplacé par le nom du service Docker
+    username: user
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update # Ou 'create' pour la première fois, puis 'update' ou 'none' en production
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+jwt:
+  secret: VotreSuperSecretJwtQuiDoitEtreTresLongEtComplexePourLaSecuriteDesTokens # À remplacer !
+  expiration: 3600000 # 1 heure en millisecondes
+
+# Pour Actuator et la surveillance
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*' # Expose tous les endpoints Actuator (à limiter en production)

@@ -1,0 +1,18 @@
+server:
+  port: 8888 # Port par défaut de Spring Cloud Config Server
+
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          # Chemin vers votre dossier de configurations Git local
+          # Assurez-vous d'avoir fait 'git init' dans library-management-system/infra/configs
+          uri: file:///${user.dir}/../infra/configs # Chemin relatif depuis le dossier du config-server
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka # Adresse du Discovery Server

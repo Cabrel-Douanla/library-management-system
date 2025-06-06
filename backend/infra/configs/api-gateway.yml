@@ -1,0 +1,29 @@
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true # Active la découverte automatique des services
+          lowerCaseServiceId: true # Permet d'utiliser des IDs de service en minuscule dans les chemins
+      routes:
+        # Route vers le microservice d'utilisateurs
+        - id: ms-users
+          uri: lb://MS-USERS # lb:// pour l'équilibrage de charge via Eureka
+          predicates:
+            - Path=/api/users/**, /api/auth/** # Tous les appels à /api/users et /api/auth iront vers ms-users
+        # Route vers le microservice de livres
+        - id: ms-books
+          uri: lb://MS-BOOKS
+          predicates:
+            - Path=/api/books/**, /api/authors/**
+        # Route vers le microservice d'emprunts
+        - id: ms-loans
+          uri: lb://MS-LOANS
+          predicates:
+            - Path=/api/loans/**, /api/returns/**, /api/reservations/**
+        # Route vers le microservice de catalogue public
+        - id: ms-public-catalog
+          uri: lb://MS-PUBLIC-CATALOG
+          predicates:
+            - Path=/api/public/**
+        # Ajoutez ici d'autres routes au fur et à mesure

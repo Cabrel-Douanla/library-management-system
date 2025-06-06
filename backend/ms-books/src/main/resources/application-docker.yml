@@ -1,0 +1,41 @@
+# Configuration spécifique pour le profil 'docker'
+spring:
+  datasource:
+    url: jdbc:postgresql://books_db:5432/books_db # Se connecte au service Docker 'books_db'
+    username: user
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  # Si vous utilisez RabbitMQ pour les événements (publier/écouter)
+  rabbitmq:
+    host: rabbitmq # Se connecte au service Docker 'rabbitmq'
+    port: 5672
+    username: guest
+    password: guest
+
+# Configuration Eureka Client
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-server:8761/eureka
+  instance:
+    preferIpAddress: true
+    hostname: ms-books
+    instance-id: ${spring.application.name}:${random.value}
+
+# Configuration Actuator pour le monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: 'health,info,prometheus'
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always

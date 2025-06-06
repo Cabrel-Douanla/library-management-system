@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: ms-users # Important pour le Config Server et Eureka
+  cloud:
+    config:
+      uri: http://localhost:8888
+      fail-fast: true
+
+server:
+  port: 0 # Le port sera attribué dynamiquement par Eureka pour éviter les conflits
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${random.value} # ID unique pour les instances

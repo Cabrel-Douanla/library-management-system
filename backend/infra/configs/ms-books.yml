@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/books_db
+    username: user
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+# Si vous utilisez Spring Cloud Stream (Kafka/RabbitMQ)
+# spring:
+#   cloud:
+#     stream:
+#       kafka:
+#         binder:
+#           brokers: localhost:9092
+#       bindings:
+#         output: # Nom du canal de sortie
+#           destination: book-events # Nom du topic Kafka/queue RabbitMQ
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

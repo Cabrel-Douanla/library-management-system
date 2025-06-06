@@ -1,0 +1,298 @@
+version: '3.8'
+
+# Définition des services (conteneurs)
+services:
+
+  # -----------------------------------------------------
+  # 1. Services de Bases de Données (PostgreSQL)
+  # -----------------------------------------------------
+  users_db:
+    image: postgres:15-alpine
+    container_name: users_db
+    environment:
+      POSTGRES_DB: users_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata_users:/var/lib/postgresql/data
+    ports:
+      - "5432:5432" # Pour accès direct depuis l'hôte si besoin
+    networks:
+      - library-network
+    healthcheck: # Vérifie si la DB est prête
+      test: ["CMD-SHELL", "pg_isready -U user -d users_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  books_db:
+    image: postgres:15-alpine
+    container_name: books_db
+    environment:
+      POSTGRES_DB: books_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata_books:/var/lib/postgresql/data
+    ports:
+      - "5433:5432" # Différent port sur l'hôte pour éviter les conflits
+    networks:
+      - library-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d books_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  loans_db:
+    image: postgres:15-alpine
+    container_name: loans_db
+    environment:
+      POSTGRES_DB: loans_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata_loans:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    networks:
+      - library-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d loans_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  public_catalog_db:
+    image: postgres:15-alpine
+    container_name: public_catalog_db
+    environment:
+      POSTGRES_DB: public_catalog_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata_public_catalog:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"
+    networks:
+      - library-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d public_catalog_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # -----------------------------------------------------
+  # 2. Service de File de Messages (RabbitMQ)
+  # -----------------------------------------------------
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672" # AMQP protocol port
+      - "15672:15672" # Management UI port
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - library-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # -----------------------------------------------------
+  # 3. Services d'Infrastructure Spring Cloud
+  # -----------------------------------------------------
+  eureka-server:
+    build:
+      context: ../backend/discovery-server # Chemin relatif au docker-compose.yml
+      dockerfile: Dockerfile
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker # Pour charger la configuration docker (voir infra/configs/application-docker.yml)
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka # S'enregistre lui-même (non fetchRegistry/registerWithEureka false)
+    networks:
+      - library-network
+
+  config-server:
+    build:
+      context: ../backend/config-server
+      dockerfile: Dockerfile
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      # Chemin vers le répertoire des configurations Git. Le volume monte le dossier hôte dans le conteneur.
+      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: file:///config
+    volumes:
+      - ../infra/configs:/config # Montage du dossier configs dans le conteneur
+    depends_on:
+      eureka-server:
+        condition: service_started # Attendre qu'Eureka soit démarré
+    networks:
+      - library-network
+
+  api-gateway:
+    build:
+      context: ../backend/api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+    depends_on:
+      eureka-server:
+        condition: service_started
+      config-server:
+        condition: service_started
+    networks:
+      - library-network
+
+  # -----------------------------------------------------
+  # 4. Microservices Applicatifs
+  # -----------------------------------------------------
+  ms-users:
+    build:
+      context: ../backend/ms-users
+      dockerfile: Dockerfile
+    container_name: ms-users
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      SPRING_DATASOURCE_URL: jdbc:postgresql://users_db:5432/users_db # Communication via le nom du service Docker
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+    depends_on:
+      users_db:
+        condition: service_healthy # Attendre que la DB soit saine
+      eureka-server:
+        condition: service_started
+      config-server:
+        condition: service_started
+    networks:
+      - library-network
+
+  ms-books:
+    build:
+      context: ../backend/ms-books
+      dockerfile: Dockerfile
+    container_name: ms-books
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      SPRING_DATASOURCE_URL: jdbc:postgresql://books_db:5432/books_db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+      # RABBITMQ_HOST: rabbitmq # Si vous utilisez RabbitMQ pour les événements
+    depends_on:
+      books_db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+      config-server:
+        condition: service_started
+      rabbitmq: # Si vous utilisez RabbitMQ
+        condition: service_healthy
+    networks:
+      - library-network
+
+  ms-loans:
+    build:
+      context: ../backend/ms-loans
+      dockerfile: Dockerfile
+    container_name: ms-loans
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      SPRING_DATASOURCE_URL: jdbc:postgresql://loans_db:5432/loans_db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+    depends_on:
+      loans_db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+      config-server:
+        condition: service_started
+    networks:
+      - library-network
+
+  ms-public-catalog:
+    build:
+      context: ../backend/ms-public-catalog
+      dockerfile: Dockerfile
+    container_name: ms-public-catalog
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      SPRING_DATASOURCE_URL: jdbc:postgresql://public_catalog_db:5432/public_catalog_db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+      # RABBITMQ_HOST: rabbitmq # Si vous utilisez RabbitMQ pour les événements
+    depends_on:
+      public_catalog_db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+      config-server:
+        condition: service_started
+      rabbitmq: # Si vous utilisez RabbitMQ
+        condition: service_healthy
+    networks:
+      - library-network
+
+  # -----------------------------------------------------
+  # 5. Monitoring (Prometheus & Grafana)
+  # -----------------------------------------------------
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml # Votre fichier de configuration Prometheus
+    command: --config.file=/etc/prometheus/prometheus.yml
+    networks:
+      - library-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana # Pour persister les dashboards et données
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin # Changer en production !
+    depends_on:
+      prometheus:
+        condition: service_started
+    networks:
+      - library-network
+
+# Définition des réseaux
+networks:
+  library-network:
+    driver: bridge
+
+# Définition des volumes persistants pour les bases de données et Grafana
+volumes:
+  pgdata_users:
+  pgdata_books:
+  pgdata_loans:
+  pgdata_public_catalog:
+  grafana_data:

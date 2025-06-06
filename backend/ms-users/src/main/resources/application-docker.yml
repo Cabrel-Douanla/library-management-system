@@ -1,0 +1,35 @@
+# Configuration spécifique pour le profil 'docker'
+spring:
+  datasource:
+    url: jdbc:postgresql://users_db:5432/users_db # Se connecte au service Docker 'users_db'
+    username: user
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update # Ou 'none' en production
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+# Configuration Eureka Client
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-server:8761/eureka # Se connecte au service Docker 'eureka-server'
+  instance:
+    preferIpAddress: true # Préférer l'adresse IP du conteneur pour l'enregistrement
+    hostname: ms-users # Le nom du service Docker sera son hostname
+    instance-id: ${spring.application.name}:${random.value} # ID unique pour les instances dupliquées
+
+# Configuration Actuator pour le monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: 'health,info,prometheus' # Expose les endpoints utiles pour Prometheus
+      base-path: /actuator # Chemin de base pour les endpoints Actuator
+  endpoint:
+    health:
+      show-details: always # Montre plus de détails sur l'état de santé

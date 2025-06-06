@@ -1,0 +1,13 @@
+server:
+  port: 8761 # Port par défaut de Eureka
+
+spring:
+  application:
+    name: discovery-server
+
+eureka:
+  client:
+    register-with-eureka: false # Ce service n'a pas besoin de s'enregistrer lui-même
+    fetch-registry: false       # Ce service n'a pas besoin de récupérer le registre
+  instance:
+    hostname: localhost # Pour le développement local, sera le nom du service Docker en production
