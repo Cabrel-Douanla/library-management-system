@@ -1,0 +1,191 @@
+<!-- ================================================================= -->
+<!-- Gestion des exemplaires (templates/exemplaires/liste.html) -->
+<!-- ================================================================= -->
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: html}">
+<head>
+    <title>Exemplaires - Bibliothèque</title>
+</head>
+<body>
+    <main th:fragment="content">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">
+                    <i class="fas fa-copy"></i> Exemplaires
+                    <span th:if="${livre}" th:text="'de &quot;' + ${livre.titre} + '&quot;'"></span>
+                </h1>
+                <div th:if="${livre}">
+                    <p><strong>Auteur :</strong> <span th:text="${livre.auteur}"></span></p>
+                    <p th:if="${livre.edition}"><strong>Édition :</strong> <span th:text="${livre.edition}"></span></p>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">
+                        <i class="fas fa-copy"></i>
+                        <span th:text="${totalExemplaires}">0</span>
+                    </div>
+                    <div class="stat-label">Total exemplaires</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">
+                        <i class="fas fa-check-circle"></i>
+                        <span th:text="${exemplairesDisponibles}">0</span>
+                    </div>
+                    <div class="stat-label">Disponibles</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">
+                        <i class="fas fa-hand-holding"></i>
+                        <span th:text="${exemplairesEmpruntes}">0</span>
+                    </div>
+                    <div class="stat-label">Empruntés</div>
+                </div>
+            </div>
+
+            <!-- Actions rapides -->
+            <div style="margin-bottom: 2rem; text-align: center;">
+                <form th:action="@{/exemplaires/livre/{id}/ajouter(id=${livreId})}" method="post" 
+                      style="display: inline-block; margin-right: 1rem;">
+                    <input type="number" name="nombreExemplaires" value="1" min="1" max="10" 
+                           style="width: 80px; padding: 0.5rem; border: 2px solid #e0e0e0; border-radius: 4px;">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Ajouter exemplaires
+                    </button>
+                </form>
+                
+                <form th:action="@{/exemplaires/livre/{id}/emprunter-premier(id=${livreId})}" method="post" 
+                      style="display: inline-block;">
+                    <button type="submit" class="btn btn-primary" 
+                            th:disabled="${exemplairesDisponibles == 0}">
+                        <i class="fas fa-hand-holding"></i> Emprunter premier disponible
+                    </button>
+                </form>
+            </div>
+
+            <div th:if="${#lists.isEmpty(exemplaires)}" style="text-align: center; padding: 3rem;">
+                <i class="fas fa-copy" style="font-size: 4rem; color: #ccc; margin-bottom: 1rem;"></i>
+                <h3>Aucun exemplaire</h3>
+                <p>Ce livre n'a pas encore d'exemplaires</p>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(exemplaires)}">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag"></i> ID</th>
+                            <th><i class="fas fa-info-circle"></i> Statut</th>
+                            <th><i class="fas fa-cog"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="exemplaire : ${exemplaires}">
+                            <td th:text="${exemplaire.id}"></td>
+                            <td>
+                                <span th:if="${exemplaire.disponible}" class="badge badge-success">
+                                    <i class="fas fa-check"></i> Disponible
+                                </span>
+                                <span th:unless="${exemplaire.disponible}" class="badge badge-danger">
+                                    <i class="fas fa-times"></i> Emprunté
+                                </span>
+                            </td>
+                            <td>
+                                <form th:if="${exemplaire.disponible}" 
+                                      th:action="@{/exemplaires/{id}/emprunter(id=${exemplaire.id})}" 
+                                      method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="fas fa-hand-holding"></i> Emprunter
+                                    </button>
+                                </form>
+                                
+                                <form th:unless="${exemplaire.disponible}" 
+                                      th:action="@{/exemplaires/{id}/retourner(id=${exemplaire.id})}" 
+                                      method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-undo"></i> Retourner
+                                    </button>
+                                </form>
+                                
+                                <form th:if="${exemplaire.disponible}" 
+                                      th:action="@{/exemplaires/{id}/supprimer(id=${exemplaire.id})}" 
+                                      method="post" style="display: inline;"
+                                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet exemplaire ?')">
+                                    <button type="submit"
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: html}">
+<head>
+    <title>Liste des livres - Bibliothèque</title>
+</head>
+<body>
+    <main th:fragment="content">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">
+                    <i class="fas fa-list"></i> Liste des livres
+                </h1>
+                <div>
+                    <a href="/livres/nouveau" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Nouveau livre
+                    </a>
+                    <a href="/livres/rechercher" class="btn btn-secondary">
+                        <i class="fas fa-search"></i> Rechercher
+                    </a>
+                </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(livres)}" style="text-align: center; padding: 3rem;">
+                <i class="fas fa-book-open" style="font-size: 4rem; color: #ccc; margin-bottom: 1rem;"></i>
+                <h3>Aucun livre trouvé</h3>
+                <p>Commencez par ajouter votre premier livre !</p>
+                <a href="/livres/nouveau" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Ajouter un livre
+                </a>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(livres)}">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag"></i> ID</th>
+                            <th><i class="fas fa-book"></i> Titre</th>
+                            <th><i class="fas fa-user"></i> Auteur</th>
+                            <th><i class="fas fa-bookmark"></i> Édition</th>
+                            <th><i class="fas fa-copy"></i> Exemplaires</th>
+                            <th><i class="fas fa-cog"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="livre : ${livres}">
+                            <td th:text="${livre.id}"></td>
+                            <td th:text="${livre.titre}"></td>
+                            <td th:text="${livre.auteur}"></td>
+                            <td th:text="${livre.edition ?: 'Non spécifiée'}"></td>
+                            <td>
+                                <a th:href="@{/exemplaires/livre/{id}(id=${livre.id})}" class="btn btn-secondary">
+                                    <i class="fas fa-eye"></i> Voir
+                                </a>
+                            </td>
+                            <td>
+                                <a th:href="@{/livres/{id}(id=${livre.id})}" class="btn btn-primary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a th:href="@{/livres/{id}/modifier(id=${livre.id})}" class="btn btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form th:action="@{/livres/{id}/supprimer(id=${livre.id})}" method="post" 
+                                      style="display: inline;" 
+                                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce livre ?')">
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
