@@ -1,0 +1,70 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+<mat-dialog-content>
+  <mat-progress-bar
+    *ngIf="loadingData()"
+    mode="indeterminate"
+  ></mat-progress-bar>
+  <form [formGroup]="returnForm" class="return-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Emprunt associé</mat-label>
+      <mat-select formControlName="loanId" required>
+        <mat-option *ngFor="let loan of loanOptions()" [value]="loan.value">{{
+          loan.label
+        }}</mat-option>
+      </mat-select>
+      <mat-error
+        *ngIf="
+          returnForm.get('loanId')?.invalid && returnForm.get('loanId')?.touched
+        "
+        >L'emprunt est requis.</mat-error
+      >
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Date effective de retour</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        formControlName="effectiveReturnDate"
+        required
+      />
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error
+        *ngIf="
+          returnForm.get('effectiveReturnDate')?.invalid &&
+          returnForm.get('effectiveReturnDate')?.touched
+        "
+        >La date de retour est requise.</mat-error
+      >
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Statut de retour</mat-label>
+      <mat-select formControlName="status" required>
+        <mat-option
+          *ngFor="let status of returnStatusOptions()"
+          [value]="status.value"
+          >{{ status.label }}</mat-option
+        >
+      </mat-select>
+      <mat-error
+        *ngIf="
+          returnForm.get('status')?.invalid && returnForm.get('status')?.touched
+        "
+        >Le statut est requis.</mat-error
+      >
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Annuler</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSave()"
+    [disabled]="returnForm.invalid"
+  >
+    Enregistrer
+  </button>
+</mat-dialog-actions>

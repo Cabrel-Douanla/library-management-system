@@ -1,0 +1,106 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+<mat-dialog-content>
+  <mat-progress-bar
+    *ngIf="loadingData()"
+    mode="indeterminate"
+  ></mat-progress-bar>
+  <form [formGroup]="reservationForm" class="reservation-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Utilisateur</mat-label>
+      <mat-select formControlName="userId" required>
+        <mat-option *ngFor="let user of userOptions()" [value]="user.value">{{
+          user.label
+        }}</mat-option>
+      </mat-select>
+      <mat-error
+        *ngIf="
+          reservationForm.get('userId')?.invalid &&
+          reservationForm.get('userId')?.touched
+        "
+        >L'utilisateur est requis.</mat-error
+      >
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Livre</mat-label>
+      <mat-select formControlName="bookId" required>
+        <mat-option *ngFor="let book of bookOptions()" [value]="book.value">{{
+          book.label
+        }}</mat-option>
+      </mat-select>
+      <mat-error
+        *ngIf="
+          reservationForm.get('bookId')?.invalid &&
+          reservationForm.get('bookId')?.touched
+        "
+        >Le livre est requis.</mat-error
+      >
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Date de réservation</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        formControlName="reservationDate"
+        required
+      />
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error
+        *ngIf="
+          reservationForm.get('reservationDate')?.invalid &&
+          reservationForm.get('reservationDate')?.touched
+        "
+        >La date est requise.</mat-error
+      >
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Durée de validité (jours)</mat-label>
+      <input
+        matInput
+        type="number"
+        formControlName="validityDurationDays"
+        required
+        min="1"
+      />
+      <mat-error
+        *ngIf="
+          reservationForm.get('validityDurationDays')?.invalid &&
+          reservationForm.get('validityDurationDays')?.touched
+        "
+        >La durée est requise (min 1 jour).</mat-error
+      >
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" *ngIf="mode === 'edit'">
+      <mat-label>Statut de réservation</mat-label>
+      <mat-select formControlName="status" required>
+        <mat-option
+          *ngFor="let status of reservationStatusOptions()"
+          [value]="status.value"
+          >{{ status.label }}</mat-option
+        >
+      </mat-select>
+      <mat-error
+        *ngIf="
+          reservationForm.get('status')?.invalid &&
+          reservationForm.get('status')?.touched
+        "
+        >Le statut est requis.</mat-error
+      >
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Annuler</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSave()"
+    [disabled]="reservationForm.invalid"
+  >
+    Enregistrer
+  </button>
+</mat-dialog-actions>

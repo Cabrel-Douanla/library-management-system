@@ -1,0 +1,18 @@
+.book-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; // Espacement entre les champs
+  padding: 10px;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+mat-dialog-actions {
+  padding: 20px 24px; // Consistent padding
+}
+
+mat-progress-bar {
+  margin-bottom: 10px;
+}

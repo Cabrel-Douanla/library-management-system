@@ -1,0 +1,67 @@
+
+html, body { height: 100%; margin: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Apply to body */
+  min-height: 100vh;
+  color: #333; /* Default text color */
+}
+
+/* Material Icons font import */
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+/* Inter font import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+
+/* Override Angular Material button defaults to match custom .btn styles */
+.mat-mdc-raised-button.btn-primary,
+.mat-mdc-outlined-button.btn-secondary,
+.mat-mdc-button.btn-secondary {
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  height: auto !important;
+  line-height: unset !important;
+  padding: 0.75rem 1rem !important;
+  min-width: unset !important;
+  transition: all 0.3s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+
+  .mat-icon {
+    margin-right: 0 !important; // Reset default Material icon margin
+  }
+}
+
+.mat-mdc-raised-button.btn-primary {
+  background: #667eea !important;
+  color: white !important;
+  &:hover {
+    background: #5a67d8 !important;
+    transform: translateY(-1px) !important;
+  }
+}
+
+.mat-mdc-outlined-button.btn-secondary,
+.mat-mdc-button.btn-secondary {
+  background: #f8f9fa !important;
+  color: #666 !important;
+  border: 1px solid #e1e5e9 !important;
+  &:hover {
+    background: #e9ecef !important;
+  }
+}
+
+.mat-mdc-button[disabled],
+.mat-mdc-raised-button[disabled],
+.mat-mdc-outlined-button[disabled] {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* Ensure the main content area has some top padding if the toolbar is fixed */
+.content {
+  padding-top: 20px; /* Adjust if your toolbar is fixed */
+}

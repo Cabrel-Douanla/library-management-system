@@ -1,0 +1,136 @@
+<div class="container">
+  <div class="header">
+    <h1>📚 Catalogue de la Bibliothèque</h1>
+    <p>Découvrez notre collection de livres et ressources</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-number">{{ totalBooksCount() }}</span>
+      <span class="stat-label">Livres</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number">{{ availableBooksCount() }}</span>
+      <span class="stat-label">Disponibles</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number">{{ newArrivalsCount() }}</span>
+      <span class="stat-label">Nouveautés</span>
+    </div>
+  </div>
+
+  <div class="search-section">
+    <div class="search-controls">
+      <mat-form-field appearance="outline" class="search-input">
+        <mat-icon matPrefix>search</mat-icon>
+        <input
+          matInput
+          [formControl]="searchControl"
+          placeholder="Rechercher par titre, auteur, ou description..."
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="genre-select">
+        <mat-label>Tous les genres</mat-label>
+        <mat-select [formControl]="selectedGenre">
+          <mat-option value="">Tous les genres</mat-option>
+          <mat-option *ngFor="let genre of availableGenres()" [value]="genre">{{
+            genre
+          }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="loadAllData()"
+        class="btn btn-primary refresh-button"
+      >
+        <mat-icon>refresh</mat-icon> Actualiser
+      </button>
+    </div>
+
+    <mat-tab-group
+      animationDuration="500ms"
+      [selectedIndex]="selectedTabIndex()"
+      (selectedIndexChange)="onTabChange($event)"
+      class="tabs-container"
+    >
+      <mat-tab label="Catalogue">
+        <ng-template matTabContent>
+          <div class="tab-content">
+            <mat-progress-bar
+              *ngIf="loading()"
+              mode="indeterminate"
+            ></mat-progress-bar>
+            <div *ngIf="!loading()" class="books-grid">
+              <app-book-card
+                *ngFor="let entry of filteredCatalogueEntries()"
+                [book]="entry"
+                (requestLoan)="onRequestLoan($event)"
+              ></app-book-card>
+            </div>
+            <div
+              *ngIf="!loading() && filteredCatalogueEntries().length === 0"
+              class="empty-state"
+            >
+              <mat-icon>search_off</mat-icon>
+              <h3>Aucun livre trouvé</h3>
+              <p>Essayez de modifier vos critères de recherche</p>
+            </div>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab label="Nouveautés">
+        <ng-template matTabContent>
+          <div class="tab-content">
+            <mat-progress-bar
+              *ngIf="loading()"
+              mode="indeterminate"
+            ></mat-progress-bar>
+            <div *ngIf="!loading()" class="books-grid">
+              <app-book-card
+                *ngFor="let entry of filteredNewArrivals()"
+                [book]="entry"
+                (requestLoan)="onRequestLoan($event)"
+              ></app-book-card>
+            </div>
+            <div
+              *ngIf="!loading() && filteredNewArrivals().length === 0"
+              class="empty-state"
+            >
+              <mat-icon>book</mat-icon>
+              <h3>Pas de nouvelles arrivées pour le moment.</h3>
+            </div>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab label="Suggestions">
+        <ng-template matTabContent>
+          <div class="tab-content">
+            <mat-progress-bar
+              *ngIf="loading()"
+              mode="indeterminate"
+            ></mat-progress-bar>
+            <div *ngIf="!loading()" class="books-grid">
+              <app-book-card
+                *ngFor="let entry of filteredSuggestions()"
+                [book]="entry"
+                (requestLoan)="onRequestLoan($event)"
+              ></app-book-card>
+            </div>
+            <div
+              *ngIf="!loading() && filteredSuggestions().length === 0"
+              class="empty-state"
+            >
+              <mat-icon>lightbulb_outline</mat-icon>
+              <h3>Pas de suggestions pour l'instant.</h3>
+            </div>
+          </div>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

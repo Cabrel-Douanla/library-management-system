@@ -1,0 +1,53 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+<mat-dialog-content>
+  <mat-progress-bar *ngIf="loadingAuthors()" mode="indeterminate"></mat-progress-bar>
+  <form [formGroup]="bookForm" class="book-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Code du livre</mat-label>
+      <input matInput formControlName="code" required>
+      <mat-error *ngIf="bookForm.get('code')?.invalid && bookForm.get('code')?.touched">Le code est requis.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Titre</mat-label>
+      <input matInput formControlName="titre" required>
+      <mat-error *ngIf="bookForm.get('titre')?.invalid && bookForm.get('titre')?.touched">Le titre est requis.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Édition</mat-label>
+      <input matInput formControlName="edition">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Description (Profil)</mat-label>
+      <textarea matInput formControlName="profil" rows="3"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>ISBN</mat-label>
+      <input matInput formControlName="isbn">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre d'exemplaires</mat-label>
+      <input matInput type="number" formControlName="nombreExemplaires" required min="0">
+      <mat-error *ngIf="bookForm.get('nombreExemplaires')?.invalid && bookForm.get('nombreExemplaires')?.touched">
+        Le nombre d'exemplaires doit être un nombre positif.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Auteurs</mat-label>
+      <mat-select formControlName="authorIds" multiple>
+        <mat-option *ngFor="let author of authors()" [value]="author.id">
+          {{ author.prenom }} {{ author.nom }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Annuler</button>
+  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="bookForm.invalid">Enregistrer</button>
+</mat-dialog-actions>

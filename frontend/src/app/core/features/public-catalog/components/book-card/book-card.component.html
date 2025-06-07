@@ -1,0 +1,39 @@
+<mat-card class="book-card">
+  <div class="book-image">
+    <!-- Remplacez par une image réelle si disponible, sinon utilisez une icône -->
+    <img *ngIf="false" src="URL_VERS_IMAGE_DE_COUVERTURE" alt="Couverture du livre">
+    <span *ngIf="true" class="material-icons">menu_book</span>
+
+    <div class="availability-badge" [class.available]="book.nombreExemplaires > 0" [class.unavailable]="book.nombreExemplaires <= 0">
+      {{ book.nombreExemplaires > 0 ? 'Disponible' : 'Indisponible' }}
+    </div>
+  </div>
+  <div class="book-content">
+    <h3 class="book-title">{{ book.titre }}</h3>
+    <p class="book-author">par {{ book.auteurNom }}</p>
+    <p class="book-description">{{ book.description | slice:0:120 }}{{ book.description && book.description.length > 120 ? '...' : '' }}</p>
+    <div class="book-details">
+        <div class="book-detail">
+            <mat-icon>category</mat-icon>
+            <span>{{ book.genre || 'Inconnu' }}</span>
+        </div>
+        <div class="book-detail">
+            <mat-icon>inventory</mat-icon>
+            <span>{{ book.nombreExemplaires }} exemplaire(s)</span>
+        </div>
+    </div>
+    <div class="book-actions">
+      <!-- Le bouton Détails peut naviguer vers une route de détails du livre ou ouvrir une modale -->
+      <button mat-button class="btn btn-secondary">
+        <mat-icon>info</mat-icon>
+        Détails
+      </button>
+      <button mat-raised-button class="btn btn-primary"
+              [disabled]="book.nombreExemplaires <= 0 || !isLoggedIn()"
+              (click)="onRequestLoan()">
+        <mat-icon>add_shopping_cart</mat-icon>
+        {{ isLoggedIn() ? (book.nombreExemplaires > 0 ? 'Emprunter' : 'Indisponible') : 'Connectez-vous' }}
+      </button>
+    </div>
+  </div>
+</mat-card>

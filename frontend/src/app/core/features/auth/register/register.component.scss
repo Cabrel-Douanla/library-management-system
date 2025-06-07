@@ -1,0 +1,22 @@
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0; /* Add padding for smaller screens if content overflows */
+}
+
+mat-card {
+  width: 500px; /* Adjust width for more fields */
+  padding: 20px;
+  text-align: center;
+}
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: 10px; /* Adjust spacing */
+}
+
+button {
+  width: 100%;
+  margin-top: 15px;
+}

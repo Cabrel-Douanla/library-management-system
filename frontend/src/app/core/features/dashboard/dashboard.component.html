@@ -1,0 +1,156 @@
+<div class="dashboard-container">
+  <mat-card *ngIf="currentUser()">
+    <mat-card-header>
+      <mat-card-title>Bienvenue sur votre Tableau de Bord !</mat-card-title>
+      <mat-card-subtitle>
+        Connecté en tant que: {{ currentUser()?.email }} (Rôle: {{ currentUser()?.role }})
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-progress-spinner *ngIf="loadingData()" mode="indeterminate" diameter="50"></mat-progress-spinner>
+
+      <!-- Section pour tous les utilisateurs connectés -->
+      <div *ngIf="!loadingData()" class="common-actions-section">
+        <h3>Actions Rapides</h3>
+        <div class="action-buttons">
+          <button mat-raised-button color="primary" routerLink="/public/catalog">
+            <mat-icon>menu_book</mat-icon> Voir le Catalogue Public
+          </button>
+          <button mat-raised-button color="accent" (click)="goToLoans()">
+            <mat-icon>receipt</mat-icon> Mes Emprunts & Réservations
+          </button>
+        </div>
+      </div>
+
+      <mat-divider *ngIf="!loadingData() && (authService.isAdmin() || authService.isBibliothecaire() || authService.isAdherent())"></mat-divider>
+
+      <!-- Section spécifique pour l'ADHÉRENT -->
+      <div *ngIf="!loadingData() && authService.isAdherent()" class="role-section">
+        <h3>Mes Activités</h3>
+        <div class="summary-cards-container">
+          <mat-card class="summary-card">
+            <mat-card-header>
+              <mat-icon mat-card-avatar>library_books</mat-icon>
+              <mat-card-title>Emprunts en cours</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p class="count">{{ myLoans().length }}</p>
+              <mat-list *ngIf="myLoans().length > 0">
+                <mat-list-item *ngFor="let loan of myLoans() | slice:0:3">
+                  <mat-icon matListItemIcon>arrow_right</mat-icon>
+                  <div matListItemTitle>Livre ID: {{ loan.bookId.slice(0, 8) }}...</div>
+                  <div matListItemLine>Depuis le: {{ loan.loanDate }}</div>
+                </mat-list-item>
+              </mat-list>
+              <p *ngIf="myLoans().length === 0">Aucun emprunt en cours.</p>
+              <button mat-button *ngIf="myLoans().length > 3" (click)="goToLoans()">Voir tous</button>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="summary-card">
+            <mat-card-header>
+              <mat-icon mat-card-avatar>bookmark</mat-icon>
+              <mat-card-title>Réservations en attente</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p class="count">{{ myReservations().length }}</p>
+              <mat-list *ngIf="myReservations().length > 0">
+                <mat-list-item *ngFor="let res of myReservations() | slice:0:3">
+                  <mat-icon matListItemIcon>arrow_right</mat-icon>
+                  <div matListItemTitle>Livre ID: {{ res.bookId.slice(0, 8) }}...</div>
+                  <div matListItemLine>Date de rés.: {{ res.reservationDate }}</div>
+                </mat-list-item>
+              </mat-list>
+              <p *ngIf="myReservations().length === 0">Aucune réservation en attente.</p>
+              <button mat-button *ngIf="myReservations().length > 3" (click)="goToLoans()">Voir toutes</button>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+
+      <mat-divider *ngIf="!loadingData() && (authService.isAdmin() || authService.isBibliothecaire())"></mat-divider>
+
+      <!-- Section spécifique pour BIBLIOTHÉCAIRE -->
+      <div *ngIf="!loadingData() && authService.isBibliothecaire()" class="role-section">
+        <h3>Statistiques de la Bibliothèque</h3>
+        <div class="summary-cards-container">
+          <mat-card class="summary-card">
+            <mat-card-header>
+              <mat-icon mat-card-avatar>book</mat-icon>
+              <mat-card-title>Total Livres</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p class="count">{{ totalBooks() }}</p>
+            </mat-card-content>
+          </mat-card>
+          <mat-card class="summary-card">
+            <mat-card-header>
+              <mat-icon mat-card-avatar>person</mat-icon>
+              <mat-card-title>Total Auteurs</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p class="count">{{ totalAuthors() }}</p>
+            </mat-card-content>
+          </mat-card>
+          <mat-card class="summary-card">
+            <mat-card-header>
+              <mat-icon mat-card-avatar>assignment_return</mat-icon>
+              <mat-card-title>Emprunts actifs</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p class="count">{{ activeLoansCount() }}</p>
+            </mat-card-content>
+          </mat-card>
+          <mat-card class="summary-card">
+            <mat-card-header>
+              <mat-icon mat-card-avatar>event_note</mat-icon>
+              <mat-card-title>Réservations en attente</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p class="count">{{ pendingReservationsCount() }}</p>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        <div class="action-buttons">
+          <button mat-raised-button color="warn" (click)="goToAdminBooks()">
+            <mat-icon>library_books</mat-icon> Gérer Livres & Auteurs
+          </button>
+          <button mat-raised-button color="warn" (click)="goToLoans()">
+            <mat-icon>rule</mat-icon> Gérer Emprunts & Retours
+          </button>
+        </div>
+      </div>
+
+      <mat-divider *ngIf="!loadingData() && authService.isAdmin()"></mat-divider>
+
+      <!-- Section spécifique pour ADMIN -->
+      <div *ngIf="!loadingData() && authService.isAdmin()" class="role-section">
+        <h3>Administration Générale</h3>
+        <div class="summary-cards-container">
+          <mat-card class="summary-card">
+            <mat-card-header>
+              <mat-icon mat-card-avatar>group</mat-icon>
+              <mat-card-title>Total Utilisateurs</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p class="count">{{ totalUsers() }}</p>
+              <mat-list *ngIf="usersByRole().length > 0">
+                <mat-list-item *ngFor="let roleStat of usersByRole()">
+                  <div matListItemTitle>{{ roleStat.role }}: {{ roleStat.count }}</div>
+                </mat-list-item>
+              </mat-list>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        <div class="action-buttons">
+          <button mat-raised-button color="warn" (click)="goToAdminUsers()">
+            <mat-icon>people</mat-icon> Gérer les Utilisateurs
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+    <mat-card-actions align="end">
+      <button mat-button (click)="logout()">Déconnexion</button>
+    </mat-card-actions>
+  </mat-card>
+</div>

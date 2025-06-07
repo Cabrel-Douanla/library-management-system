@@ -1,0 +1,67 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+<mat-dialog-content>
+  <mat-progress-bar
+    *ngIf="loadingData()"
+    mode="indeterminate"
+  ></mat-progress-bar>
+  <form [formGroup]="loanForm" class="loan-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Utilisateur</mat-label>
+      <mat-select formControlName="userId" required>
+        <mat-option *ngFor="let user of userOptions()" [value]="user.value">{{
+          user.label
+        }}</mat-option>
+      </mat-select>
+      <mat-error
+        *ngIf="
+          loanForm.get('userId')?.invalid && loanForm.get('userId')?.touched
+        "
+        >L'utilisateur est requis.</mat-error
+      >
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Livre</mat-label>
+      <mat-select formControlName="bookId" required>
+        <mat-option *ngFor="let book of bookOptions()" [value]="book.value">{{
+          book.label
+        }}</mat-option>
+      </mat-select>
+      <mat-error
+        *ngIf="
+          loanForm.get('bookId')?.invalid && loanForm.get('bookId')?.touched
+        "
+        >Le livre est requis.</mat-error
+      >
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Date d'emprunt</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        formControlName="loanDate"
+        required
+      />
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error
+        *ngIf="
+          loanForm.get('loanDate')?.invalid && loanForm.get('loanDate')?.touched
+        "
+        >La date d'emprunt est requise.</mat-error
+      >
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Annuler</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSave()"
+    [disabled]="loanForm.invalid"
+  >
+    Enregistrer
+  </button>
+</mat-dialog-actions>

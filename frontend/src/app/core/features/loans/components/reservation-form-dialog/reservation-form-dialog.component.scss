@@ -1,0 +1,18 @@
+.reservation-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 10px;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+mat-dialog-actions {
+  padding: 20px 24px;
+}
+
+mat-progress-bar {
+  margin-bottom: 10px;
+}

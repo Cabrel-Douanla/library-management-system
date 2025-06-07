@@ -1,0 +1,283 @@
+/* --- Global Styles for Material Components (to match provided HTML) --- */
+/* These should ideally go into your global styles.scss or a dedicated theme file */
+
+// Adjust MatFormField to match the input style
+:host ::ng-deep .mat-mdc-form-field-appearance-standard .mat-mdc-form-field-flex-valid {
+  background-color: white;
+  border-radius: 12px;
+  border: 2px solid #e1e5e9;
+  padding: 0 1rem;
+  height: 56px; // Match button height
+  .mat-mdc-form-field-infix {
+    padding: 0;
+    margin-top: 8px; // Adjust vertical alignment
+  }
+  .mat-mdc-form-field-label {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    margin-left: 2.5rem; // Space for icon
+  }
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none; // Hide default hints/errors for cleaner look
+  }
+}
+
+:host ::ng-deep .mat-mdc-form-field-appearance-standard.mat-focused .mat-mdc-form-field-flex-valid {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+:host ::ng-deep .mat-mdc-form-field-icon {
+  margin-right: 0.5rem;
+}
+
+:host ::ng-deep .mat-mdc-text-field-wrapper.mdc-text-field--filled .mdc-text-field__input {
+  padding-left: 2.5rem; // Space for icon
+}
+
+:host ::ng-deep .mat-mdc-form-field-prefix {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+}
+
+// Custom styles for tabs (mat-tab-group)
+:host ::ng-deep .mdc-tab-bar {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center; // Center tabs
+}
+
+:host ::ng-deep .mat-mdc-tab {
+  flex: 1;
+  min-width: unset !important; // Override default min-width
+  text-align: center;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white !important; // Default tab color
+  font-weight: 500;
+  .mdc-tab__text-label {
+    opacity: 0.9;
+  }
+}
+
+:host ::ng-deep .mat-mdc-tab-header-pagination {
+  display: none !important; // Hide pagination if tabs overflow
+}
+
+:host ::ng-deep .mat-mdc-tab.mdc-tab--active {
+  background: white;
+  color: #667eea !important; // Active tab color
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  .mdc-tab__text-label {
+    font-weight: 700; // Bold for active tab
+    opacity: 1;
+  }
+}
+
+:host ::ng-deep .mat-mdc-tab:hover:not(.mdc-tab--active) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+// Hide the ink bar (the active tab underline)
+:host ::ng-deep .mat-mdc-tab-group.mat-primary .mat-mdc-tab-header-pagination-after,
+:host ::ng-deep .mat-mdc-tab-group.mat-primary .mat-mdc-tab-header-pagination-before,
+:host ::ng-deep .mat-mdc-tab-header-pagination-after,
+:host ::ng-deep .mat-mdc-tab-header-pagination-before {
+  display: none !important;
+}
+
+:host ::ng-deep .mat-mdc-tab-header .mat-mdc-tab-labels {
+  justify-content: center;
+}
+
+:host ::ng-deep .mat-mdc-tab-group.mat-primary .mat-ink-bar {
+  display: none;
+}
+
+/* --- Component Specific Styles --- */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  // Background from body to container for better control
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: calc(100vh - 64px); // Adjust for toolbar height
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+  color: white;
+  h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    font-weight: 300;
+  }
+}
+
+.stats {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap; // Allow wrapping on small screens
+
+  .stat {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      display: block;
+    }
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+}
+
+.search-section {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.search-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+
+  .search-input {
+    flex: 1;
+    min-width: 300px;
+  }
+
+  .genre-select {
+    min-width: 200px;
+  }
+
+  .refresh-button {
+    height: 56px; // Match input height
+  }
+}
+
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #757575; // Change color for empty state as it's inside search-section now
+  .material-icons {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+  }
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  p {
+    font-size: 1rem;
+    opacity: 0.8;
+  }
+}
+
+mat-progress-bar {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+/* Base button styles from original HTML for consistency */
+.btn {
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  min-width: unset; // Override Material default min-width for buttons
+  line-height: unset; // Override Material default line-height
+  height: auto; // Allow height to adjust to content
+}
+
+.btn-primary {
+  background: #667eea;
+  color: white;
+  &:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+  }
+}
+
+.btn-secondary {
+  background: #f8f9fa;
+  color: #666;
+  border: 1px solid #e1e5e9;
+  &:hover {
+    background: #e9ecef;
+  }
+}
+
+.btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  .header h1 {
+    font-size: 2rem;
+  }
+  .search-controls {
+    flex-direction: column;
+    align-items: stretch;
+    .search-input, .genre-select, button {
+      width: 100%;
+    }
+  }
+  .books-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+  .stats {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
