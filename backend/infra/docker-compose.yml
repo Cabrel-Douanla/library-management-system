@@ -107,7 +107,7 @@ services:
   # -----------------------------------------------------
   eureka-server:
     build:
-      context: ../backend/discovery-server # Chemin relatif au docker-compose.yml
+      context: ../discovery-server # Chemin relatif au docker-compose.yml
       dockerfile: Dockerfile
     container_name: eureka-server
     ports:
@@ -120,7 +120,7 @@ services:
 
   config-server:
     build:
-      context: ../backend/config-server
+      context: ../config-server
       dockerfile: Dockerfile
     container_name: config-server
     ports:
@@ -140,7 +140,7 @@ services:
 
   api-gateway:
     build:
-      context: ../backend/api-gateway
+      context: ../api-gateway
       dockerfile: Dockerfile
     container_name: api-gateway
     ports:
@@ -162,7 +162,7 @@ services:
   # -----------------------------------------------------
   ms-users:
     build:
-      context: ../backend/ms-users
+      context: ../ms-users
       dockerfile: Dockerfile
     container_name: ms-users
     environment:
@@ -184,7 +184,7 @@ services:
 
   ms-books:
     build:
-      context: ../backend/ms-books
+      context: ../ms-books
       dockerfile: Dockerfile
     container_name: ms-books
     environment:
@@ -209,7 +209,7 @@ services:
 
   ms-loans:
     build:
-      context: ../backend/ms-loans
+      context: ../ms-loans
       dockerfile: Dockerfile
     container_name: ms-loans
     environment:
@@ -231,7 +231,7 @@ services:
 
   ms-public-catalog:
     build:
-      context: ../backend/ms-public-catalog
+      context: ../ms-public-catalog
       dockerfile: Dockerfile
     container_name: ms-public-catalog
     environment:

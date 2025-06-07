@@ -1,10 +1,14 @@
+# library-management-system/backend/ms-books/src/main/resources/bootstrap.yml
+
 spring:
   application:
     name: ms-books
   cloud:
     config:
-      uri: http://localhost:8888
+      uri: http://config-server:8888 # L'URI de votre Config Server
       fail-fast: true
+  config:
+    import: optional:configserver:http://config-server:8888
 
 server:
   port: 0
@@ -12,6 +16,6 @@ server:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://eureka-server:8761/eureka
   instance:
     instance-id: ${spring.application.name}:${random.value}

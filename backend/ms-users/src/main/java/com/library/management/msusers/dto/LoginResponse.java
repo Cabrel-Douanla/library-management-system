@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LoginResponse {
     private String jwtToken;
-    private String userRole; // Pour faciliter la navigation côté frontend
+    private String userRole;
     private String userEmail;
 }

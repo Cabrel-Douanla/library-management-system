@@ -4,23 +4,24 @@ import com.library.management.msusers.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Data; // Génère getters, setters, toString, equals, hashCode
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetails; // Import crucial
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-@Data
+@Data // Va générer getPassword() et getUsername() si les champs sont nommés
+      // `password` et `username`
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "utilisateurs") // Nom de la table dans la base de données
+@Table(name = "utilisateurs")
 public class User implements UserDetails {
 
     @Id
@@ -28,7 +29,7 @@ public class User implements UserDetails {
     private UUID id;
 
     @Column(unique = true, nullable = false, length = 20)
-    private String code; // Code unique pour l'utilisateur, ex: ADH001, BIB001
+    private String code;
 
     @Column(nullable = false, length = 100)
     private String nom;
@@ -48,7 +49,7 @@ public class User implements UserDetails {
     private String email;
 
     @Column(name = "mot_de_passe_hash", nullable = false, columnDefinition = "TEXT")
-    private String password; // mot_de_passe_hash dans la DB
+    private String password; // Ce champ est utilisé par getPassword()
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
@@ -57,39 +58,48 @@ public class User implements UserDetails {
     @Column(nullable = false, length = 20)
     private String etat; // "actif", "inactif", "suspendu"
 
-    // --- Implémentation de UserDetails ---
+    // --- Implémentation des méthodes de l'interface UserDetails ---
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Retourne une liste d'autorités basées sur le rôle de l'utilisateur
+        // Le préfixe "ROLE_" est une convention de Spring Security
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override
     public String getUsername() {
-        return email; // L'email est utilisé comme nom d'utilisateur pour l'authentification
+        // L'email est utilisé comme nom d'utilisateur pour l'authentification
+        return email;
+    }
+
+    @Override
+    public String getPassword() {
+        // Lombok génère déjà le getter pour `password` grâce à @Data,
+        // mais pour l'implémentation de UserDetails, il est bon d'avoir l'override
+        // explicite
+        return password;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true; // Pour l'instant, pas de gestion d'expiration de compte
+        return true; // Pour l'instant, la gestion de l'expiration du compte n'est pas implémentée
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; // Pour l'instant, pas de gestion de verrouillage de compte
+        return true; // Pour l'instant, la gestion du verrouillage de compte n'est pas implémentée
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // Pour l'instant, pas de gestion d'expiration des credentials
+        return true; // Pour l'instant, la gestion de l'expiration des identifiants n'est pas
+                     // implémentée
     }
 
     @Override
     public boolean isEnabled() {
-        return "actif".equalsIgnoreCase(etat); // Le compte est actif si son état est "actif"
+        // Le compte est considéré comme activé si son état est "actif"
+        return "actif".equalsIgnoreCase(etat);
     }
-
-    // Le getter pour le mot de passe est déjà fourni par Lombok (@Data)
-    // @Override
-    // public String getPassword() { return password; }
 }

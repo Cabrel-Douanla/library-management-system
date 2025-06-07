@@ -17,24 +17,27 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserRegistrationRequest {
-    @NotBlank(message = "Nom is required")
+    // Le champ 'code' peut être généré ou fourni par l'admin
+    private String code; // Peut être null lors de l'inscription simple
+
+    @NotBlank(message = "Nom est requis")
     private String nom;
 
-    @NotBlank(message = "Prenom is required")
+    @NotBlank(message = "Prénom est requis")
     private String prenom;
 
     private LocalDate dateNaissance;
     private String sexe;
     private String adresse;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email should be valid")
+    @NotBlank(message = "Email est requis")
+    @Email(message = "Email doit être valide")
     private String email;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters long")
+    @NotBlank(message = "Mot de passe est requis")
+    @Size(min = 6, message = "Mot de passe doit contenir au moins 6 caractères")
     private String password;
 
-    @NotNull(message = "Role is required")
-    private Role role; // Le rôle par défaut peut être ADHÉRENT si non spécifié par l'admin
+    @NotNull(message = "Rôle est requis")
+    private Role role;
 }
